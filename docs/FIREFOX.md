@@ -12,7 +12,7 @@ keys:
 },
 "browser_specific_settings": {
   "gecko": {
-    "id": "claude-switch-account@smeagolworms4",
+    "id": "claude-switch-account-private@agteamdev",
     "strict_min_version": "140.0",
     "data_collection_permissions": { "required": ["none"] }
   }

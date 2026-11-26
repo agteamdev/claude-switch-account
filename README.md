@@ -2,12 +2,9 @@
 
 Browser extension (Manifest V3) to keep **several claude.ai accounts** side by side and switch between them **in one click** — no logging out and back in every time.
 
-[![build](https://github.com/Smeagolworms4/claude-switch-account/actions/workflows/build.yml/badge.svg)](https://github.com/Smeagolworms4/claude-switch-account/actions/workflows/build.yml)
+[![build](https://github.com/agteamdev/claude-switch-account/actions/workflows/build.yml/badge.svg)](https://github.com/agteamdev/claude-switch-account/actions/workflows/build.yml)
 
-[!["Buy Me A Coffee"](https://raw.githubusercontent.com/Smeagolworms4/donate-assets/master/coffee.png)](https://www.buymeacoffee.com/smeagolworms4)
-[!["Buy Me A Coffee"](https://raw.githubusercontent.com/Smeagolworms4/donate-assets/master/paypal.png)](https://www.paypal.com/donate/?business=SURRPGEXF4YVU&no_recurring=0&item_name=Hello%2C+I%27m+SmeagolWorms4.+For+my+open+source+projects.%0AThanks+you+very+mutch+%21%21%21&currency_code=EUR)
-
-**English** · [Français](README.fr.md)
+Based on [claude-switch-account](https://github.com/Smeagolworms4/claude-switch-account) by Smeagolworms4 (MIT).
 
 <p align="center">
   <img src="docs/screenshot.png" alt="The extension popup listing three saved accounts, with the active one highlighted" width="380">
@@ -29,7 +26,7 @@ Everything stays **local** in `chrome.storage.local`. No server, no telemetry, n
 
 ### From a release
 
-1. Download the `.zip` from [Releases](https://github.com/Smeagolworms4/claude-switch-account/releases) and unzip it.
+1. Download the `.zip` from [Releases](https://github.com/agteamdev/claude-switch-account/releases) and unzip it.
 2. Open `chrome://extensions` (or `brave://extensions`, `edge://extensions`).
 3. Enable **Developer mode**.
 4. **Load unpacked** → pick the unzipped folder.
@@ -37,7 +34,7 @@ Everything stays **local** in `chrome.storage.local`. No server, no telemetry, n
 ### From source
 
 ```bash
-git clone https://github.com/Smeagolworms4/claude-switch-account.git
+git clone https://github.com/agteamdev/claude-switch-account.git
 cd claude-switch-account
 ```
 
@@ -53,7 +50,7 @@ Then load the folder directly with **Load unpacked**. There is no build step: pl
 | **↻ Refresh active account** | Re-saves the active account's cookies (handy after re-authenticating) |
 | **✎ / 🗑** | Rename / delete a profile |
 | **Drag an account** | Reorder the list; the order is saved |
-| **⇩ Import / ⇧ Export** | Export saves all accounts to a JSON file; import merges such a file into the list (a session already saved is only replaced by a newer one). On Firefox, Import opens in a tab |
+| **⇩ Import / ⇧ Export** | Export saves all accounts to a JSON file, optionally encrypted with a password; import merges such a file into the list (a session already saved is only replaced by a newer one) and asks for the password when the file is encrypted. On Firefox, Import opens in a tab |
 
 ### Adding a second account
 
@@ -108,17 +105,17 @@ The one-time setup for automated publishing is documented in
 ## Security & limitations
 
 - Session cookies are stored **in plaintext** in the extension's local storage — same as your browser's cookie jar. On a shared machine, delete the profiles before walking away.
-- An **export file contains the session cookies in plaintext** and works like a password for those accounts: keep it private and delete it once imported.
+- An **export file without a password contains the session cookies in plaintext** and works like a password for those accounts: keep it private and delete it once imported. With a password the file is encrypted (AES-256-GCM, key derived with PBKDF2-SHA-256, 600,000 iterations); a lost password cannot be recovered.
 - Only one account is active **per browser profile** at a time: this is switching, not simultaneous isolation (for that, use Chrome profiles or Firefox containers).
 - Unofficial extension, unaffiliated with Anthropic.
-- Tested on Chrome / Brave / Edge. Firefox needs a manifest variant (`background.scripts`).
+- Works on Chrome / Brave / Edge and on Firefox 140 or newer (see [docs/FIREFOX.md](docs/FIREFOX.md)).
 
 ## Support
 
-If this saves you time, coffee is appreciated:
+If the extension saves you time, you can support its development:
 
-[!["Buy Me A Coffee"](https://raw.githubusercontent.com/Smeagolworms4/donate-assets/master/coffee.png)](https://www.buymeacoffee.com/smeagolworms4)
-[!["Buy Me A Coffee"](https://raw.githubusercontent.com/Smeagolworms4/donate-assets/master/paypal.png)](https://www.paypal.com/donate/?business=SURRPGEXF4YVU&no_recurring=0&item_name=Hello%2C+I%27m+SmeagolWorms4.+For+my+open+source+projects.%0AThanks+you+very+mutch+%21%21%21&currency_code=EUR)
+- [Patreon](https://www.patreon.com/al3xg0r)
+- [Crypto donation (NOWPayments)](https://nowpayments.io/donation/al3xg0r)
 
 ## License
 

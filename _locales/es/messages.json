@@ -1,13 +1,13 @@
 {
   "extName": {
-    "message": "Account Switcher for Claude",
+    "message": "Private Account Switcher for Claude",
     "description": "Nombre de la extensión"
   },
   "extDesc": {
     "message": "Guarda varias sesiones de claude.ai y cambia de cuenta con un clic."
   },
   "appTitle": {
-    "message": "Account Switcher for Claude"
+    "message": "Private Account Switcher for Claude"
   },
   "openClaude": {
     "message": "Abrir claude.ai"
@@ -156,5 +156,37 @@
   },
   "titleDrag": {
     "message": "Arrastra para reordenar"
+  },
+  "pwExportLabel": {
+    "message": "Contraseña para cifrar la exportación (vacío = archivo sin cifrar)"
+  },
+  "pwRepeatLabel": {
+    "message": "Repite la contraseña"
+  },
+  "pwImportLabel": {
+    "message": "Este archivo está cifrado. Introduce su contraseña."
+  },
+  "btnOk": {
+    "message": "Aceptar"
+  },
+  "btnCancel": {
+    "message": "Cancelar"
+  },
+  "errPasswordShort": {
+    "message": "La contraseña debe tener al menos 8 caracteres."
+  },
+  "errPasswordMismatch": {
+    "message": "Las contraseñas no coinciden."
+  },
+  "errWrongPassword": {
+    "message": "Contraseña incorrecta o archivo dañado."
+  },
+  "okExportedEncrypted": {
+    "message": "Cuentas exportadas y cifradas: $N$.",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

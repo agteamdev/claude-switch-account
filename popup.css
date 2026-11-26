@@ -222,3 +222,37 @@ button:disabled { opacity: 0.5; cursor: default; }
   opacity: 0.45;
   border-style: dashed;
 }
+
+/* --- password panel (export / import of an encrypted file) --- */
+
+footer[hidden],
+.pw[hidden],
+.pw input[hidden] { display: none; }
+
+.pw {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.pw label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.pw input {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+}
+
+.pw input:focus {
+  outline: none;
+  border-color: var(--accent);
+}

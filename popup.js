@@ -211,16 +211,80 @@ function downloadJson(data, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 
-$("export").addEventListener("click", () =>
-  run(async () => {
-    if (!confirm(t("confirmExport"))) return (await send("getState")).state;
-    const data = await send("exportAccounts");
+const footerEl = document.querySelector("footer");
+const pwEl = $("pw");
+const pwInput = $("pw-input");
+const pwRepeat = $("pw-repeat");
+let pwResolve = null;
+
+/** Shows the password panel in place of the buttons; resolves with the password, or null if cancelled. */
+function askPassword({ label, repeat }) {
+  $("pw-label").textContent = label;
+  pwInput.value = "";
+  pwRepeat.value = "";
+  pwRepeat.hidden = !repeat;
+  pwRepeat.placeholder = t("pwRepeatLabel");
+  pwRepeat.setAttribute("aria-label", t("pwRepeatLabel"));
+  footerEl.hidden = true;
+  pwEl.hidden = false;
+  pwInput.focus();
+  return new Promise((resolve) => {
+    pwResolve = resolve;
+  });
+}
+
+function closePassword(value) {
+  pwEl.hidden = true;
+  footerEl.hidden = false;
+  pwInput.value = "";
+  pwRepeat.value = "";
+  const resolve = pwResolve;
+  pwResolve = null;
+  resolve?.(value);
+}
+
+$("pw-ok").addEventListener("click", () => {
+  const value = pwInput.value;
+  if (!pwRepeat.hidden) {
+    if (value && value.length < 8) return notify(t("errPasswordShort"));
+    if (value !== pwRepeat.value) return notify(t("errPasswordMismatch"));
+  }
+  notify("");
+  closePassword(value);
+});
+
+$("pw-cancel").addEventListener("click", () => {
+  notify("");
+  closePassword(null);
+});
+
+pwEl.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    $("pw-ok").click();
+  } else if (e.key === "Escape") {
+    e.preventDefault();
+    e.stopPropagation();
+    $("pw-cancel").click();
+  }
+});
+
+$("export").addEventListener("click", async () => {
+  if (busy) return;
+  const password = await askPassword({ label: t("pwExportLabel"), repeat: true });
+  if (password === null) return;
+  // Without a password the file holds the cookies in plain text: make that a conscious choice.
+  if (!password && !confirm(t("confirmExport"))) return;
+
+  await run(async () => {
+    const data = await send("exportAccounts", { password });
     const day = new Date().toISOString().slice(0, 10);
     downloadJson(data, `claude-switch-account-${day}.json`);
-    notify(t("okExported", data.accounts.length), true);
-    return (await send("getState")).state;
-  })
-);
+    const { state } = await send("getState");
+    notify(t(password ? "okExportedEncrypted" : "okExported", state.accounts.length), true);
+    return state;
+  });
+});
 
 $("import").addEventListener("click", () => {
   if (needsTabForImport) {
@@ -231,26 +295,33 @@ $("import").addEventListener("click", () => {
   importFileEl.click();
 });
 
-importFileEl.addEventListener("change", () =>
-  run(async () => {
-    const file = importFileEl.files?.[0];
-    importFileEl.value = "";
-    if (!file) return (await send("getState")).state;
+importFileEl.addEventListener("change", async () => {
+  const file = importFileEl.files?.[0];
+  importFileEl.value = "";
+  if (!file) return;
 
-    let data;
-    try {
-      if (file.size > MAX_IMPORT_BYTES) throw new Error("too large");
-      data = JSON.parse(await file.text());
-    } catch {
-      throw new Error(t("errImportInvalid"));
-    }
+  let data;
+  try {
+    if (file.size > MAX_IMPORT_BYTES) throw new Error("too large");
+    data = JSON.parse(await file.text());
+  } catch {
+    notify(t("errImportInvalid"));
+    return;
+  }
 
-    const state = await send("importAccounts", { data });
+  let password = "";
+  if (data?.encrypted === true) {
+    password = await askPassword({ label: t("pwImportLabel"), repeat: false });
+    if (password === null) return;
+  }
+
+  await run(async () => {
+    const state = await send("importAccounts", { data, password });
     const { added, updated, skipped } = state.importResult;
     notify(t("okImported", added, updated, skipped), true);
     return state;
-  })
-);
+  });
+});
 
 /* ------------------------------------------------------ drag to reorder --- */
 

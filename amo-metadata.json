@@ -2,15 +2,20 @@
   "version": {
     "license": "MIT"
   },
-  "categories": ["privacy-security", "tabs"],
+  "categories": [
+    "privacy-security",
+    "tabs"
+  ],
   "summary": {
     "en-US": "Save several claude.ai sessions and switch accounts in one click. Local only, no tracking, open source.",
-    "fr": "Enregistrez plusieurs sessions claude.ai et basculez de compte en un clic. Tout reste en local."
+    "fr": "Enregistrez plusieurs sessions claude.ai et basculez de compte en un clic. Tout reste en local.",
+    "uk": "Зберігайте кілька сеансів claude.ai і перемикайте акаунти одним кліком. Усе локально, без відстеження, відкритий код.",
+    "ru": "Сохраняйте несколько сеансов claude.ai и переключайте аккаунты одним кликом. Всё локально, без слежки, открытый код."
   },
   "homepage": {
-    "en-US": "https://github.com/Smeagolworms4/claude-switch-account"
+    "en-US": "https://github.com/agteamdev/claude-switch-account"
   },
   "support_url": {
-    "en-US": "https://github.com/Smeagolworms4/claude-switch-account/issues"
+    "en-US": "https://github.com/agteamdev/claude-switch-account/issues"
   }
 }

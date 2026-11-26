@@ -33,6 +33,16 @@
       <input id="import-file" type="file" accept="application/json,.json" hidden />
     </footer>
 
+    <section id="pw" class="pw" hidden>
+      <label id="pw-label" for="pw-input"></label>
+      <input id="pw-input" type="password" autocomplete="new-password" />
+      <input id="pw-repeat" type="password" autocomplete="new-password" hidden />
+      <div class="row">
+        <button id="pw-cancel" class="ghost small" data-i18n="btnCancel"></button>
+        <button id="pw-ok" class="primary small" data-i18n="btnOk"></button>
+      </div>
+    </section>
+
     <script src="popup.js"></script>
   </body>
 </html>

@@ -1,6 +1,6 @@
 # Privacy Policy — Claude Switch Account
 
-Last updated: 6 August 2026
+Last updated: 25 November 2026
 
 ## Summary
 
@@ -18,6 +18,16 @@ organization name, so the profile can be labelled in the list.
 This data is written to `chrome.storage.local`, the extension's local storage
 area on your computer. It is **not** synchronized to your Google account and
 never leaves your browser.
+
+## Export and import
+
+The extension can write your saved profiles to a JSON file on your computer
+(Export) and read such a file back (Import). This only happens when you click
+the button, and the file is saved wherever your browser saves downloads; the
+extension never uploads it. If you set a password, the file is encrypted in your
+browser (AES-256-GCM, key derived from the password with PBKDF2); if you leave
+the password empty, the file contains the session cookies in plain text. The
+password is not stored and cannot be recovered.
 
 ## Network requests
 
@@ -69,7 +79,7 @@ to Anthropic.
 ## Contact
 
 Questions or concerns: open an issue at
-<https://github.com/Smeagolworms4/claude-switch-account/issues>.
+<https://github.com/agteamdev/claude-switch-account/issues>.
 
 The full source code is public and auditable at
-<https://github.com/Smeagolworms4/claude-switch-account>.
+<https://github.com/agteamdev/claude-switch-account>.

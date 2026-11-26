@@ -1,13 +1,13 @@
 {
   "extName": {
-    "message": "Account Switcher for Claude",
+    "message": "Private Account Switcher for Claude",
     "description": "Назва розширення"
   },
   "extDesc": {
     "message": "Зберігайте кілька сеансів claude.ai і перемикайте акаунти одним кліком."
   },
   "appTitle": {
-    "message": "Account Switcher for Claude"
+    "message": "Private Account Switcher for Claude"
   },
   "openClaude": {
     "message": "Відкрити claude.ai"
@@ -156,5 +156,37 @@
   },
   "titleDrag": {
     "message": "Перетягніть, щоб змінити порядок"
+  },
+  "pwExportLabel": {
+    "message": "Пароль для шифрування експорту (порожньо — файл без шифрування)"
+  },
+  "pwRepeatLabel": {
+    "message": "Повторіть пароль"
+  },
+  "pwImportLabel": {
+    "message": "Цей файл зашифровано. Введіть його пароль."
+  },
+  "btnOk": {
+    "message": "OK"
+  },
+  "btnCancel": {
+    "message": "Скасувати"
+  },
+  "errPasswordShort": {
+    "message": "Пароль має містити щонайменше 8 символів."
+  },
+  "errPasswordMismatch": {
+    "message": "Паролі не збігаються."
+  },
+  "errWrongPassword": {
+    "message": "Неправильний пароль або пошкоджений файл."
+  },
+  "okExportedEncrypted": {
+    "message": "Акаунтів експортовано та зашифровано: $N$.",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }

@@ -281,8 +281,89 @@ const EXPORT_FORMAT = "claude-switch-account";
 const EXPORT_VERSION = 1;
 const SAME_SITE = new Set(["no_restriction", "lax", "strict", "unspecified"]);
 
-/** Returns every saved account, with a fresh snapshot of the active one. */
-async function exportAccounts() {
+const KDF_NAME = "PBKDF2-SHA256";
+const KDF_ITERATIONS = 600000; // OWASP minimum for PBKDF2-HMAC-SHA256
+const KDF_MIN_ITERATIONS = 100000;
+const KDF_MAX_ITERATIONS = 2000000; // an imported file must not be able to freeze the browser
+const MIN_PASSWORD_LENGTH = 8;
+
+function toBase64(bytes) {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(binary);
+}
+
+const fromBase64 = (text) => Uint8Array.from(atob(text), (c) => c.charCodeAt(0));
+
+async function deriveKey(password, salt, iterations) {
+  const material = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveKey"]
+  );
+  return crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt, iterations, hash: "SHA-256" },
+    material,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"]
+  );
+}
+
+/** AES-256-GCM with a key derived from the password; salt and IV are random per export. */
+async function encryptExport(payload, password) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveKey(password, salt, KDF_ITERATIONS);
+  const plain = new TextEncoder().encode(JSON.stringify(payload));
+  const cipher = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, plain);
+  return {
+    format: EXPORT_FORMAT,
+    version: EXPORT_VERSION,
+    encrypted: true,
+    kdf: KDF_NAME,
+    iterations: KDF_ITERATIONS,
+    salt: toBase64(salt),
+    iv: toBase64(iv),
+    data: toBase64(new Uint8Array(cipher))
+  };
+}
+
+/** Reverses encryptExport; a wrong password and a modified file both fail the GCM check. */
+async function decryptExport(file, password) {
+  const { iterations, salt, iv, data } = file;
+  const valid =
+    file.kdf === KDF_NAME &&
+    Number.isInteger(iterations) &&
+    iterations >= KDF_MIN_ITERATIONS &&
+    iterations <= KDF_MAX_ITERATIONS &&
+    [salt, iv, data].every((v) => typeof v === "string");
+  if (!valid) throw new Error(t("errImportInvalid"));
+  if (!password) throw new Error(t("errWrongPassword"));
+
+  let plain;
+  try {
+    const key = await deriveKey(password, fromBase64(salt), iterations);
+    plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: fromBase64(iv) }, key, fromBase64(data));
+  } catch {
+    throw new Error(t("errWrongPassword"));
+  }
+
+  try {
+    const inner = JSON.parse(new TextDecoder().decode(plain));
+    return { format: file.format, version: file.version, accounts: inner.accounts };
+  } catch {
+    throw new Error(t("errImportInvalid"));
+  }
+}
+
+/** Returns every saved account, with a fresh snapshot of the active one. An empty password means a plain file. */
+async function exportAccounts(password = "") {
+  if (password && password.length < MIN_PASSWORD_LENGTH) throw new Error(t("errPasswordShort"));
   const state = await getState();
   if (!state.accounts.length) throw new Error(t("errNothingToExport"));
 
@@ -293,12 +374,13 @@ async function exportAccounts() {
     await setState(state);
   }
 
-  return {
+  const payload = {
     format: EXPORT_FORMAT,
     version: EXPORT_VERSION,
     exportedAt: new Date().toISOString(),
     accounts: state.accounts
   };
+  return password ? encryptExport(payload, password) : payload;
 }
 
 function isClaudeDomain(domain) {
@@ -359,7 +441,10 @@ function sanitizeAccount(raw, storeIds, position) {
  * saved (same id or same e-mail) is only overwritten when the imported session
  * is newer. The active account is left untouched.
  */
-async function importAccounts(data) {
+async function importAccounts(data, password = "") {
+  if (data && data.format === EXPORT_FORMAT && data.encrypted === true) {
+    data = await decryptExport(data, password);
+  }
   if (!data || data.format !== EXPORT_FORMAT || !Array.isArray(data.accounts)) {
     throw new Error(t("errImportInvalid"));
   }
@@ -438,8 +523,8 @@ const HANDLERS = {
 };
 
 Object.assign(HANDLERS, {
-  exportAccounts: () => exportAccounts(),
-  importAccounts: ({ data }) => importAccounts(data)
+  exportAccounts: ({ password }) => exportAccounts(password),
+  importAccounts: ({ data, password }) => importAccounts(data, password)
 });
 
 Object.assign(HANDLERS, {

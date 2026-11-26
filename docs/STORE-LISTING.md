@@ -9,7 +9,7 @@ Every field of the submission form, filled in. Copy them across as-is.
 ### Item name
 
 ```
-Account Switcher for Claude
+Private Account Switcher for Claude
 ```
 
 > Deliberately not "Claude Switch Account". "Claude" is an Anthropic trademark,
@@ -46,9 +46,10 @@ FEATURES
 • One-click switching between saved accounts
 • Automatic account name and e-mail detection
 • Open claude.ai tabs reload themselves after a switch
-• Rename and delete profiles
+• Rename, delete and reorder profiles (drag and drop)
+• Export and import your profiles, optionally encrypted with a password
 • "New login" clears the session without touching your saved profiles
-• Available in English, French, German, Spanish, Italian and Portuguese
+• Available in English, French, German, Spanish, Italian, Portuguese, Ukrainian and Russian
 
 PRIVACY
 
@@ -60,7 +61,7 @@ GOOD TO KNOW
 
 One account is active per browser profile at a time — this is switching, not running several accounts simultaneously. For simultaneous sessions, use Chrome profiles.
 
-Full source code, auditable: https://github.com/Smeagolworms4/claude-switch-account
+Full source code, auditable: https://github.com/agteamdev/claude-switch-account
 ```
 
 ### Category
@@ -135,7 +136,7 @@ Authentication cookies are read and restored locally to switch between the user'
 ### Privacy policy URL
 
 ```
-https://github.com/Smeagolworms4/claude-switch-account/blob/main/PRIVACY.md
+https://github.com/agteamdev/claude-switch-account/blob/main/PRIVACY.md
 ```
 
 ---

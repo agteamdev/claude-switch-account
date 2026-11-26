@@ -1,13 +1,13 @@
 {
   "extName": {
-    "message": "Account Switcher for Claude",
+    "message": "Private Account Switcher for Claude",
     "description": "Nom de l'extension"
   },
   "extDesc": {
     "message": "Enregistrez plusieurs sessions claude.ai et basculez de compte en un clic."
   },
   "appTitle": {
-    "message": "Account Switcher for Claude"
+    "message": "Private Account Switcher for Claude"
   },
   "openClaude": {
     "message": "Ouvrir claude.ai"
@@ -156,5 +156,37 @@
   },
   "titleDrag": {
     "message": "Glisser pour réorganiser"
+  },
+  "pwExportLabel": {
+    "message": "Mot de passe pour chiffrer l'export (vide = fichier non chiffré)"
+  },
+  "pwRepeatLabel": {
+    "message": "Répétez le mot de passe"
+  },
+  "pwImportLabel": {
+    "message": "Ce fichier est chiffré. Saisissez son mot de passe."
+  },
+  "btnOk": {
+    "message": "OK"
+  },
+  "btnCancel": {
+    "message": "Annuler"
+  },
+  "errPasswordShort": {
+    "message": "Le mot de passe doit contenir au moins 8 caractères."
+  },
+  "errPasswordMismatch": {
+    "message": "Les mots de passe ne correspondent pas."
+  },
+  "errWrongPassword": {
+    "message": "Mot de passe incorrect ou fichier endommagé."
+  },
+  "okExportedEncrypted": {
+    "message": "Comptes exportés et chiffrés : $N$.",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
   }
 }
