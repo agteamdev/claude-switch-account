@@ -98,6 +98,8 @@ Output in `dist/`:
 - `claude-switch-account-<version>-chrome.zip` and `…-firefox.zip`: the packages.
 - `claude-switch-account-<version>-sources.zip`: the complete sources, for stores that ask for them (addons.mozilla.org). Running `bash tools/build.sh` on them gives the same packages.
 
+Notes for store reviewers: there is no minification, bundling or transpilation. The build only copies the files and rewrites `manifest.json` (see above); the Firefox package is exactly the content of `dist/firefox-mv3/`. Built and tested on Ubuntu 24.04 with Node.js 22 and zip 3.0 (the addons.mozilla.org default reviewer environment is Ubuntu 24.04).
+
 ### CI
 
 `.github/workflows/build.yml` runs on every push to `main`, every PR and every tag:
