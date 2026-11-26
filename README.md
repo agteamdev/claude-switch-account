@@ -1,13 +1,13 @@
-# Claude Switch Account
+# Private Account Switcher for Claude
 
 Browser extension (Manifest V3) to keep **several claude.ai accounts** side by side and switch between them **in one click** — no logging out and back in every time.
 
 [![build](https://github.com/agteamdev/claude-switch-account/actions/workflows/build.yml/badge.svg)](https://github.com/agteamdev/claude-switch-account/actions/workflows/build.yml)
 
-Based on [claude-switch-account](https://github.com/Smeagolworms4/claude-switch-account) by Smeagolworms4 (MIT).
+Based on [claude-switch-account](https://github.com/Smeagolworms4/claude-switch-account) by Smeagolworms4 (MIT). Unofficial, not affiliated with Anthropic.
 
 <p align="center">
-  <img src="docs/screenshot.png" alt="The extension popup listing three saved accounts, with the active one highlighted" width="380">
+  <img src="docs/screenshot.png" alt="The extension popup listing four saved accounts, with the active one highlighted" width="380">
 </p>
 
 ---
@@ -26,10 +26,14 @@ Everything stays **local** in `chrome.storage.local`. No server, no telemetry, n
 
 ### From a release
 
-1. Download the `.zip` from [Releases](https://github.com/agteamdev/claude-switch-account/releases) and unzip it.
-2. Open `chrome://extensions` (or `brave://extensions`, `edge://extensions`).
-3. Enable **Developer mode**.
-4. **Load unpacked** → pick the unzipped folder.
+Download the zip for your browser from [Releases](https://github.com/agteamdev/claude-switch-account/releases):
+
+| Browser | File | How to load |
+| --- | --- | --- |
+| Chrome, Brave, Edge | `…-chrome.zip` | Unzip it, open `chrome://extensions` (or `brave://extensions`, `edge://extensions`), enable **Developer mode**, **Load unpacked** → the unzipped folder |
+| Firefox 140+ | `…-firefox.zip` | Open `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on…** → pick the zip (or the unzipped `manifest.json`); it stays until Firefox restarts |
+
+A permanent install in regular Firefox needs a signed build, i.e. the addons.mozilla.org listing.
 
 ### From source
 
@@ -38,7 +42,7 @@ git clone https://github.com/agteamdev/claude-switch-account.git
 cd claude-switch-account
 ```
 
-Then load the folder directly with **Load unpacked**. There is no build step: plain JS, zero dependencies.
+Load the folder directly (**Load unpacked** in Chrome, **Load Temporary Add-on…** → `manifest.json` in Firefox). The packages are built with `bash tools/build.sh` (see [Development](#development)).
 
 ## Usage
 
@@ -70,37 +74,44 @@ Adding a language = copy `_locales/en/messages.json` to `_locales/<code>/message
 ## Development
 
 ```
-manifest.json          # MV3, cookies/storage/tabs permissions
-background.js          # service worker: cookie snapshot / clear / restore
-popup.html/.css/.js    # account list UI
-_locales/<lang>/       # translations
-icons/                 # generated icons
-tools/build.sh         # produces dist/claude-switch-account-<version>.zip
-tools/make-icons.py    # regenerates the icons (needs Pillow)
+manifest.json                 # MV3, cookies/storage/tabs permissions
+background.js                 # service worker: cookie snapshot / clear / restore, export / import
+popup.html/.css/.js           # account list UI
+_locales/<lang>/              # translations
+icons/                        # extension icons
+store/                        # store screenshots
+tools/build.sh                # builds dist/: Chrome and Firefox packages + sources
+tools/amo-version-exists.mjs  # CI helper: is this version already on AMO?
 ```
 
+### Building
+
+Requirements: `bash`, `zip`, `node` 18 or newer.
+
 ```bash
-bash tools/build.sh          # package
-python3 tools/make-icons.py  # regenerate icons
+bash tools/build.sh
 ```
+
+Output in `dist/`:
+
+- `chrome-mv3/`, `firefox-mv3/`: unpacked builds. They differ only in `manifest.json`: Chrome gets `background.service_worker`, Firefox gets `background.scripts` and the `browser_specific_settings` block.
+- `claude-switch-account-<version>-chrome.zip` and `…-firefox.zip`: the packages.
+- `claude-switch-account-<version>-sources.zip`: the complete sources, for stores that ask for them (addons.mozilla.org). Running `bash tools/build.sh` on them gives the same packages.
 
 ### CI
 
-`.github/workflows/build.yml` runs on every push, PR and tag:
+`.github/workflows/build.yml` runs on every push to `main`, every PR and every tag:
 
 - validates the manifest and **translation key parity** across all locales;
 - checks JS syntax (`node --check`);
-- builds the zip and uploads it as a downloadable **artifact**;
-- on a `v*` tag: aligns `manifest.version` with the tag, creates the **GitHub release** with the zip attached, then publishes to the Chrome Web Store.
+- builds the Chrome, Firefox and sources zips and uploads them as downloadable **artifacts**;
+- on a `v*` tag: aligns `manifest.version` with the tag and creates the **GitHub release** with the three zips attached. If the `AMO_JWT_ISSUER` and `AMO_JWT_SECRET` secrets are set, it also submits the Firefox package to addons.mozilla.org.
 
 Cutting a release:
 
 ```bash
-git tag v1.0.1 && git push origin v1.0.1
+git tag vX.Y.Z && git push origin vX.Y.Z   # X.Y.Z is the version to release; CI writes it into manifest.json
 ```
-
-The one-time setup for automated publishing is documented in
-[docs/PUBLISHING.md](docs/PUBLISHING.md).
 
 ## Security & limitations
 

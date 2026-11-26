@@ -1,5 +1,5 @@
 /**
- * Claude Switch Account — service worker.
+ * Private Account Switcher for Claude — service worker.
  *
  * How it works: claude.ai authentication lives in cookies (sessionKey chief
  * among them). We snapshot every cookie for the domain into a profile stored in

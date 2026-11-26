@@ -1,10 +1,10 @@
-# Privacy Policy — Claude Switch Account
+# Privacy Policy — Private Account Switcher for Claude
 
 Last updated: 25 November 2026
 
 ## Summary
 
-Claude Switch Account does not collect, transmit, sell or share any personal
+Private Account Switcher for Claude does not collect, transmit, sell or share any personal
 data. There is no server, no analytics, no tracking and no third party. Every
 piece of data the extension handles stays on your own device.
 

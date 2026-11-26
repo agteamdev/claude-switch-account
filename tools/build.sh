@@ -1,11 +1,20 @@
 #!/usr/bin/env bash
-# Builds dist/claude-switch-account-<version>.zip, ready to load or publish.
+# Builds dist/:
+#   chrome-mv3/  firefox-mv3/                    unpacked builds (differ only in manifest.json)
+#   claude-switch-account-<version>-chrome.zip   Chrome / Brave / Edge package
+#   claude-switch-account-<version>-firefox.zip  Firefox package
+#   claude-switch-account-<version>-sources.zip  complete sources (addons.mozilla.org asks for them)
+# Requires: bash, zip, node.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+for tool in zip node; do
+  command -v "$tool" >/dev/null || { echo "error: '$tool' is required" >&2; exit 1; }
+done
+
+NAME=claude-switch-account
 VERSION="${1:-$(node -p "require('./manifest.json').version")}"
-OUT="dist/claude-switch-account-${VERSION}.zip"
 
 # An MV3 manifest without default_locale breaks every __MSG_*__, so check first.
 node -e '
@@ -19,9 +28,34 @@ node -e '
 rm -rf dist
 mkdir -p dist
 
-zip -r -q "$OUT" \
-  manifest.json background.js popup.html popup.css popup.js \
-  _locales icons \
-  -x '*.DS_Store'
+for target in chrome firefox; do
+  dir="dist/${target}-mv3"
+  mkdir -p "$dir"
+  cp -R background.js popup.html popup.css popup.js _locales icons "$dir/"
+  find "$dir" -name '.DS_Store' -delete
 
-echo "-> $OUT ($(du -h "$OUT" | cut -f1))"
+  # Each browser gets only the manifest keys it understands.
+  node -e '
+    const fs = require("fs");
+    const [target, version, out] = process.argv.slice(1);
+    const m = JSON.parse(fs.readFileSync("manifest.json", "utf8"));
+    m.version = version;
+    if (target === "chrome") {
+      delete m.browser_specific_settings;
+      delete m.background.scripts;
+    } else {
+      delete m.background.service_worker;
+    }
+    fs.writeFileSync(out, JSON.stringify(m, null, 2) + "\n");
+  ' "$target" "$VERSION" "$dir/manifest.json"
+
+  (cd "$dir" && zip -r -q "../${NAME}-${VERSION}-${target}.zip" .)
+done
+
+# Sources: everything needed to rebuild with `bash tools/build.sh`.
+zip -r -q "dist/${NAME}-${VERSION}-sources.zip" . \
+  -x 'dist/*' '.git/*' 'node_modules/*' 'store/*' '*.DS_Store'
+
+for f in dist/*.zip; do
+  echo "-> $f ($(du -h "$f" | cut -f1))"
+done

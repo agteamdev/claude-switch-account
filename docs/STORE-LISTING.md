@@ -1,28 +1,25 @@
-# Chrome Web Store listing — ready-to-paste copy
+# Store listing — ready-to-paste copy (addons.mozilla.org)
 
-Every field of the submission form, filled in. Copy them across as-is.
+The fields of the submission form, filled in. Copy them across as-is.
 
 ---
 
-## Store listing tab
+## Listing
 
-### Item name
+### Name
 
 ```
 Private Account Switcher for Claude
 ```
 
-> Deliberately not "Claude Switch Account". "Claude" is an Anthropic trademark,
-> and listings whose name reads as first-party get rejected. The "… for X"
-> wording is the accepted pattern for third-party tools.
+> "Claude" is an Anthropic trademark, so the name reads as a third-party tool
+> ("… for Claude") and the description says it is not affiliated.
 
-### Summary (132 characters max)
+### Summary
 
 ```
-Save several claude.ai sessions and switch between accounts in one click. Local only, no tracking, open source.
+Save several claude.ai sessions and switch accounts in one click. Local only, no tracking, open source.
 ```
-
-*(110 characters)*
 
 ### Description
 
@@ -55,116 +52,66 @@ PRIVACY
 
 Everything stays on your device. No server, no analytics, no tracking, no third party, no remote code. The only network request made is to the claude.ai API, using the cookies already in your browser, to read the account name shown in the list.
 
-Session cookies are stored in the extension's local storage, the same way your browser already stores its own cookies. Deleting a profile erases them immediately; uninstalling removes everything.
+Session cookies are stored in the extension's local storage, the same way your browser already stores its own cookies. Deleting a profile erases them immediately; uninstalling removes everything. Export writes a file only when you click Export; with a password it is encrypted in your browser, without one it contains the cookies in plain text.
 
 GOOD TO KNOW
 
-One account is active per browser profile at a time — this is switching, not running several accounts simultaneously. For simultaneous sessions, use Chrome profiles.
+One account is active per browser profile at a time — this is switching, not running several accounts simultaneously. For simultaneous sessions, use separate browser profiles (or Firefox containers).
 
 Full source code, auditable: https://github.com/agteamdev/claude-switch-account
 ```
 
-### Category
+### Categories
 
-`Productivity`
+`Privacy & Security`, `Tabs`
 
-### Language
+### License
 
-`English`
+`MIT`
 
----
+### Privacy policy
 
-## Privacy tab
-
-### Single purpose
-
-```
-Switch between multiple claude.ai accounts by saving and restoring their session cookies.
-```
-
-### Permission justifications
-
-**`cookies`**
-
-```
-The extension's entire function is switching claude.ai accounts, which is done by saving the cookies of one session and restoring another. Without this permission the extension cannot work at all. Only cookies on claude.ai and anthropic.com are ever read or written.
-```
-
-**`storage`**
-
-```
-Saved account profiles are kept in chrome.storage.local so they survive a browser restart. Nothing is written anywhere else and nothing is synchronized to the user's Google account.
-```
-
-**`tabs`**
-
-```
-After switching accounts, open claude.ai tabs still show the previous session. The extension reloads only those tabs so the new session takes effect. It does not read tab content.
-```
-
-**Host permission — `claude.ai`, `anthropic.com`**
-
-```
-These are the only domains whose cookies are handled. The extension also calls the claude.ai API with the user's existing cookies to read the account display name and e-mail, so each saved profile can be labelled in the list.
-```
-
-**Remote code**
-
-```
-No, I am not using remote code.
-```
-
-> True: everything is bundled, nothing is fetched and executed.
-
-### Data usage — what is collected
-
-Tick **Authentication information** ("PII such as passwords, credentials,
-security question or PIN") — session cookies fall under it. Nothing else.
-
-Then certify all three:
-
-- data is not sold or transferred to third parties, outside approved use cases
-- data is not used for purposes unrelated to the item's single purpose
-- data is not used to determine creditworthiness or for lending purposes
-
-Justification, if a free-text field is offered:
-
-```
-Authentication cookies are read and restored locally to switch between the user's own claude.ai accounts. They are stored only in the extension's local storage on the user's device, are never transmitted anywhere, and are deleted when the profile or the extension is removed.
-```
-
-### Privacy policy URL
+Paste the text of `PRIVACY.md`, or link it:
 
 ```
 https://github.com/agteamdev/claude-switch-account/blob/main/PRIVACY.md
 ```
 
----
+### Support site
 
-## Assets
-
-| Field | File |
-| --- | --- |
-| Icon 128×128 | already inside the zip (`icons/icon128.png`) |
-| Small promo tile 440×280 | `store/promo-440x280.png` |
-| Screenshot 1280×800 | `store/screenshot-1280x800.png` |
+```
+https://github.com/agteamdev/claude-switch-account/issues
+```
 
 ---
 
-## Distribution tab
+## Notes for reviewers
 
-- Visibility: **Public**
-- Regions: all
-- Pricing: free
+```
+Plain JavaScript. The package only copies the source files and rewrites manifest.json
+for Firefox (tools/build.sh, see the README); no minification, no remote code, no analytics.
 
----
+Purpose: keep several claude.ai logins and switch between them. The extension saves the
+claude.ai / anthropic.com session cookies of the user's own logged-in session into
+browser.storage.local and writes them back when the user clicks an account. Nothing is
+sent to any third party.
 
-## Review notes
+Permissions:
+- cookies + host permissions for claude.ai and anthropic.com: read and restore the
+  session cookies (the only thing the extension manages).
+- storage: save the profiles locally.
+- tabs: reload open claude.ai tabs after a switch; open the popup page in a tab for
+  Import on Firefox (the toolbar popup closes when a file picker opens).
 
-Two things draw scrutiny on this item. Address them up front rather than
-waiting for the reviewer's question:
+Network: one request, to claude.ai with the user's own cookies, to read the name and
+e-mail of the signed-in account so the profile can be labelled. No other requests.
 
-- the name must not imply it is an official Anthropic product;
-- manipulating a third party's session cookies is a common rejection trigger —
-  the defence is that everything is local, no data leaves the browser, no
-  remote code is loaded, and the source is public.
+Export / Import: the user can write the profiles to a JSON file and read it back. The
+file can be encrypted in the browser with a password (AES-256-GCM, key from
+PBKDF2-SHA-256, 600,000 iterations, random salt and IV). The password is never stored.
+
+To test without a real account: Export / Import, drag-and-drop ordering and the password
+dialog work without logging in; switching accounts needs a claude.ai session.
+
+Based on https://github.com/Smeagolworms4/claude-switch-account (MIT).
+```

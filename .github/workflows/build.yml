@@ -75,51 +75,8 @@ jobs:
           files: dist/*.zip
           generate_release_notes: true
 
-  # Publishes to the Chrome Web Store on v* tags. Skipped when the CWS secrets
-  # are not configured, so forks and early tags still build fine.
-  publish:
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    environment: chrome-web-store
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Check for Chrome Web Store credentials
-        id: creds
-        env:
-          CWS_CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
-        run: |
-          if [ -n "$CWS_CLIENT_ID" ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::CWS secrets missing, skipping Chrome Web Store publish"
-          fi
-
-      - name: Download the built package
-        if: steps.creds.outputs.ready == 'true'
-        uses: actions/download-artifact@v4
-        with:
-          name: claude-switch-account
-          path: dist
-
-      - name: Upload and publish
-        if: steps.creds.outputs.ready == 'true'
-        env:
-          CWS_CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
-          CWS_CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
-          CWS_REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
-          CWS_PUBLISHER_ID: ${{ secrets.CWS_PUBLISHER_ID }}
-          CWS_EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
-        run: node tools/publish-cws.mjs dist/*.zip
-
-  # Publishes the same package to addons.mozilla.org. Independent of the Chrome
-  # job so one store failing does not hold back the other.
+  # Submits the Firefox package to addons.mozilla.org on v* tags. Skipped when the
+  # AMO secrets are not configured, so forks and early tags still build fine.
   publish-firefox:
     needs: build
     if: startsWith(github.ref, 'refs/tags/v')
@@ -151,8 +108,8 @@ jobs:
           name: claude-switch-account
           path: dist
 
-      # The two stores drift, so this version may already be on AMO while Chrome
-      # still needs it. AMO rejects duplicate versions, so skip rather than fail.
+      # AMO rejects duplicate versions, so skip rather than fail when this one is
+      # already there (for example after a manual first submission).
       - name: Check the version is new to AMO
         id: amo
         if: steps.creds.outputs.ready == 'true'
@@ -171,7 +128,7 @@ jobs:
       - name: Lint for Firefox
         if: steps.amo.outputs.publish == 'true'
         run: |
-          mkdir -p unpacked && unzip -q dist/*.zip -d unpacked
+          mkdir -p unpacked && unzip -q dist/*-firefox.zip -d unpacked
           npx --yes web-ext@latest lint --source-dir unpacked
 
       - name: Sign and publish on AMO

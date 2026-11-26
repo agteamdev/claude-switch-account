@@ -256,3 +256,14 @@ footer[hidden],
   outline: none;
   border-color: var(--accent);
 }
+
+/* --- header logo --- */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.brand img { flex: 0 0 auto; }
