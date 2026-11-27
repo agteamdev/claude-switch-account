@@ -1,12 +1,5 @@
-# Never commit publishing credentials — these grant publish rights on the stores.
-googlauth/
-mozauth/
-*client_secret*.json
-*.secret
-.env
-
 dist/
 node_modules/
 *.zip
 .DS_Store
-__pycache__/
+.env

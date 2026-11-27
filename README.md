@@ -79,9 +79,7 @@ background.js                 # service worker: cookie snapshot / clear / restor
 popup.html/.css/.js           # account list UI
 _locales/<lang>/              # translations
 icons/                        # extension icons
-store/                        # store screenshots
 tools/build.sh                # builds dist/: Chrome and Firefox packages + sources
-tools/amo-version-exists.mjs  # CI helper: is this version already on AMO?
 ```
 
 ### Building
@@ -98,7 +96,7 @@ Output in `dist/`:
 - `claude-switch-account-<version>-chrome.zip` and `…-firefox.zip`: the packages.
 - `claude-switch-account-<version>-sources.zip`: the complete sources, for stores that ask for them (addons.mozilla.org). Running `bash tools/build.sh` on them gives the same packages.
 
-Notes for store reviewers: there is no minification, bundling or transpilation. The build only copies the files and rewrites `manifest.json` (see above); the Firefox package is exactly the content of `dist/firefox-mv3/`. Built and tested on Ubuntu 24.04 with Node.js 22 and zip 3.0 (the addons.mozilla.org default reviewer environment is Ubuntu 24.04).
+There is no minification, bundling or transpilation: the build only copies the files and rewrites `manifest.json` as described above, so the Firefox package is exactly the content of `dist/firefox-mv3/`. Built and tested on Ubuntu 24.04 with Node.js 22 and zip 3.0.
 
 ### CI
 
@@ -107,7 +105,7 @@ Notes for store reviewers: there is no minification, bundling or transpilation. 
 - validates the manifest and **translation key parity** across all locales;
 - checks JS syntax (`node --check`);
 - builds the Chrome, Firefox and sources zips and uploads them as downloadable **artifacts**;
-- on a `v*` tag: aligns `manifest.version` with the tag and creates the **GitHub release** with the three zips attached. If the `AMO_JWT_ISSUER` and `AMO_JWT_SECRET` secrets are set, it also submits the Firefox package to addons.mozilla.org.
+- on a `v*` tag: aligns `manifest.version` with the tag and creates the **GitHub release** with the three zips attached.
 
 Cutting a release:
 
@@ -121,7 +119,7 @@ git tag vX.Y.Z && git push origin vX.Y.Z   # X.Y.Z is the version to release; CI
 - An **export file without a password contains the session cookies in plaintext** and works like a password for those accounts: keep it private and delete it once imported. With a password the file is encrypted (AES-256-GCM, key derived with PBKDF2-SHA-256, 600,000 iterations); a lost password cannot be recovered.
 - Only one account is active **per browser profile** at a time: this is switching, not simultaneous isolation (for that, use Chrome profiles or Firefox containers).
 - Unofficial extension, unaffiliated with Anthropic.
-- Works on Chrome / Brave / Edge and on Firefox 140 or newer (see [docs/FIREFOX.md](docs/FIREFOX.md)).
+- Works on Chrome / Brave / Edge and on Firefox 140 or newer.
 
 ## Support
 

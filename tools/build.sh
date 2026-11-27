@@ -54,7 +54,7 @@ done
 
 # Sources: everything needed to rebuild with `bash tools/build.sh`.
 zip -r -q "dist/${NAME}-${VERSION}-sources.zip" . \
-  -x 'dist/*' '.git/*' 'node_modules/*' 'store/*' '*.DS_Store'
+  -x 'dist/*' '.git/*' 'node_modules/*' '*.DS_Store'
 
 for f in dist/*.zip; do
   echo "-> $f ($(du -h "$f" | cut -f1))"
